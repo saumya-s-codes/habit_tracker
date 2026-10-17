@@ -504,6 +504,9 @@ button.rmin.on{color:var(--g);text-decoration:none}
 .verline b{font-weight:600;color:var(--ink)}
 .verline span{font-size:12px;color:var(--faint)}
 .popscrim.still,.iconpop.still{animation:none}
+.iphead{display:flex;align-items:center;justify-content:space-between;flex:none;padding:14px 12px 8px 18px}
+.iconpop .iphead h3{padding:0}
+.ipdone{background:none;border:0;padding:8px 10px;font:600 15px var(--sans);color:var(--g);cursor:pointer;border-radius:10px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -1364,7 +1367,7 @@ function renderIconPop(){
   const d=S.sheet.draft,old=document.querySelector('#popRoot .ipgrid'),st=old?old.scrollTop:0;
   const again=String($('#popRoot').innerHTML||'').includes('iconpop');   // already open: just refresh it, no fade-in
   const still=again?' still':'';
-  $('#popRoot').innerHTML=`<div class="scrim popscrim${still}" data-a="closePop"></div><div class="iconpop${still}" role="dialog" aria-modal="true" aria-label="Choose an icon and color" style="--c:${d.color}"><h3>Choose an icon</h3>
+  $('#popRoot').innerHTML=`<div class="scrim popscrim${still}" data-a="closePop"></div><div class="iconpop${still}" role="dialog" aria-modal="true" aria-label="Choose an icon and color" style="--c:${d.color}"><div class="iphead"><h3>Choose an icon</h3><button class="ipdone" data-a="closePop">Done</button></div>
     <div class="ipgrid">${HABIT_ICONS.map(n=>`<button class="ddo${d.icon===n?' on':''}" data-a="fset" data-k="icon" data-v="${n}" aria-label="${ICON_NAMES[n]}">${icon(n,22)}</button>`).join('')}</div>
     <div class="ipcolors" role="group" aria-label="Color">${COLORS.map(c=>`<button class="dds${d.color===c?' on':''}" style="--c:${c}" data-a="popcolor" data-v="${c}" aria-label="${COLOR_NAMES[c]}" aria-pressed="${d.color===c}"></button>`).join('')}</div></div>`;
   const g=document.querySelector('#popRoot .ipgrid');if(g)g.scrollTop=st;
@@ -1446,7 +1449,7 @@ function formBody(){
   return `${header}${s.from==='cal'?`${logSection(s)}<div class="divider"></div>`:''}${settings}<div class="divider"></div>${plan}${err}${del}`;
 }
 /* Bump these when you ship a change; they show at the bottom of Settings. */
-const APP_VERSION='1.2.5',APP_UPDATED='Oct 17, 2026';
+const APP_VERSION='1.2.6',APP_UPDATED='Oct 17, 2026';
 function settingsBody(){
   const c=S.sheet.confirm;
   return `<h2 class="stitle">Settings</h2>
@@ -1489,10 +1492,11 @@ function openForm(mode,h,extra){
   if(mode==='new')setTimeout(()=>{const n=$('#f-name');if(n)n.focus()},320);
 }
 function fset(k,v){
-  const d=S.sheet.draft;d[k]=v;if(k==='icon')closeIconPop();if(k==='icon'||k==='color')S.sheet.pick=null;
+  const d=S.sheet.draft;d[k]=v;if(k==='icon'||k==='color')S.sheet.pick=null;
   if(k==='kind'){d.goal=v==='binary'?'1':(['1','2','3'].includes(d.goal)?'10':d.goal);if(v==='amount'&&!d.step)d.step='1'}
   if(k==='period'&&d.kind==='binary')d.goal='1';
   S.sheet.err='';renderSheetBody();
+  if(iconPopOpen&&(k==='icon'||k==='color'))renderIconPop();   // the popup stays open and just refreshes
   if(S.sheet.mode==='edit')liveApply();
 }
 function buildHabit(d){
