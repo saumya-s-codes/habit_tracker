@@ -86,7 +86,7 @@ h1{font:400 28px/1.1 var(--serif);letter-spacing:-.012em;margin:0}
 .segs i{flex:1;height:4px;border-radius:2px;background:var(--track)}
 .row.done .segs i{background:color-mix(in srgb,var(--c) 14%,var(--card))}
 .segs i.on{background:var(--c)!important}
-.rcue{font-size:12px;color:var(--muted);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
+.rcue{font-size:12px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:4px}
 .rcue svg{color:#E6A100;flex:none}
 .rcue+.rcue{margin-top:2px}
 .act svg{width:18px;height:18px}
@@ -173,7 +173,7 @@ h1{font:400 28px/1.1 var(--serif);letter-spacing:-.012em;margin:0}
 .two .tilecard b{font-size:30px}
 .perfcard,.totcard{padding:16px;margin-bottom:12px}
 .perf{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;padding:8px 0;cursor:pointer;text-align:left}
-.perf .pn{flex:0 0 118px;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.perf .pn{flex:0 0 118px;font-size:14.5px;line-height:1.25;overflow-wrap:anywhere}
 .perf .pb{flex:1;height:8px;border-radius:4px;background:var(--track);overflow:hidden}
 .perf .pb i{display:block;height:100%;border-radius:4px;background:color-mix(in srgb,var(--g) 70%,var(--card))}
 .perf .pp{width:38px;text-align:right;font-size:14px}
@@ -249,11 +249,11 @@ h1{font:400 28px/1.1 var(--serif);letter-spacing:-.012em;margin:0}
 
 .rcue{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);margin-top:6px;min-width:0}
 .rcue svg{flex:none;color:var(--c)}
-.rcue span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rcue span{overflow-wrap:anywhere}
 .minchip{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:8px;font-size:11px;font-weight:600;color:color-mix(in srgb,var(--c) 75%,var(--ink));background:color-mix(in srgb,var(--c) 14%,var(--card));white-space:nowrap}
 .why{display:flex;align-items:center;gap:7px;width:100%;background:none;border:0;padding:6px 4px 2px;text-align:left;cursor:pointer;color:var(--muted);min-width:0}
 .why svg{flex:none;color:var(--c)}
-.why span{font:italic 400 14px var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.why span{font:italic 400 14px var(--serif)}
 .plan{border:1px solid var(--line);border-radius:16px;margin-bottom:16px;background:var(--bg)}
 .plan>div{display:grid;grid-template-columns:76px 1fr;gap:10px;padding:11px 14px;align-items:baseline}
 .plan>div+div{border-top:1px solid var(--line)}
@@ -277,10 +277,10 @@ html,body,#app,#app *{-webkit-user-select:none;user-select:none;-webkit-touch-ca
 
 .rtop{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .rname{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;min-width:0}
-.rn{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rn{min-width:0;max-width:100%;overflow-wrap:anywhere}
 .namechk{flex:none;display:grid;color:var(--g)}
 .rcount{flex:none;font-size:12.5px;color:var(--muted);white-space:nowrap}
-.rwhy{font:italic 400 13px/1.3 var(--serif);color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rwhy{font:italic 400 13px/1.3 var(--serif);color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
 .rsub{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-top:6px;min-width:0}
 .rsub .rcue{margin-top:0;min-width:0;max-width:100%;flex:0 1 auto}
 .rsub .minchip{margin-left:0;flex:none}
@@ -340,7 +340,7 @@ html,body,#app,#app *{-webkit-user-select:none;user-select:none;-webkit-touch-ca
 .hcur{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center}
 .hcur .hr{display:flex;align-items:center;gap:8px;max-width:100%}
 .hcur .pi{color:var(--c);display:grid;flex:none}
-.hcur .pn{font:400 21px/1.2 var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hcur .pn{font:400 21px/1.2 var(--serif);overflow-wrap:anywhere}
 .hcur .hs{font-size:12px;color:var(--muted);margin-top:2px}
 .cell.blank{background:none;border:0;box-shadow:none;cursor:default;pointer-events:none}
 
@@ -351,7 +351,7 @@ button.hcur{background:none;border:0;color:inherit;font:inherit;cursor:pointer;p
 .hpitem{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;background:none;border:0;border-radius:14px;text-align:left;cursor:pointer}
 .hpitem.on{background:color-mix(in srgb,var(--c) 10%,var(--card))}
 .hpn{flex:1;min-width:0}
-.hpn b{display:block;font:400 17px/1.25 var(--serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hpn b{display:block;font:400 17px/1.25 var(--serif);overflow-wrap:anywhere}
 .hpn small{font-size:12px;color:var(--muted)}
 .hpk{color:var(--g);display:grid}
 .legend{display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
@@ -458,7 +458,7 @@ button.hcur{background:none;border:0;color:inherit;font:inherit;cursor:pointer;p
 .apfield{flex:1;min-width:0;display:flex;align-items:center;gap:4px;height:42px;padding:0 10px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
 .apfield:focus-within{border-color:var(--g)}
 .apfield input{flex:1;min-width:0;width:100%;border:0;background:none;outline:none;font:400 20px var(--serif);color:var(--ink);text-align:center}
-.apu{color:var(--muted);font-size:12px;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.apu{color:var(--muted);font-size:12px;white-space:nowrap}
 .apcap{font-size:12px;color:var(--muted);text-align:center;margin-top:7px;min-height:15px}
 .apcap.bad{color:var(--danger)}
 .apcaret{position:absolute;width:12px;height:12px;background:var(--card);transform:rotate(45deg)}
@@ -503,6 +503,7 @@ button.rmin.on{color:var(--g);text-decoration:none}
 .verline{margin-top:26px;text-align:center;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
 .verline b{font-weight:600;color:var(--ink)}
 .verline span{font-size:12px;color:var(--faint)}
+.popscrim.still,.iconpop.still{animation:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -1361,7 +1362,9 @@ function renderInsights(){
 let iconPopOpen=false;
 function renderIconPop(){
   const d=S.sheet.draft,old=document.querySelector('#popRoot .ipgrid'),st=old?old.scrollTop:0;
-  $('#popRoot').innerHTML=`<div class="scrim popscrim" data-a="closePop"></div><div class="iconpop" role="dialog" aria-modal="true" aria-label="Choose an icon and color" style="--c:${d.color}"><h3>Choose an icon</h3>
+  const again=String($('#popRoot').innerHTML||'').includes('iconpop');   // already open: just refresh it, no fade-in
+  const still=again?' still':'';
+  $('#popRoot').innerHTML=`<div class="scrim popscrim${still}" data-a="closePop"></div><div class="iconpop${still}" role="dialog" aria-modal="true" aria-label="Choose an icon and color" style="--c:${d.color}"><h3>Choose an icon</h3>
     <div class="ipgrid">${HABIT_ICONS.map(n=>`<button class="ddo${d.icon===n?' on':''}" data-a="fset" data-k="icon" data-v="${n}" aria-label="${ICON_NAMES[n]}">${icon(n,22)}</button>`).join('')}</div>
     <div class="ipcolors" role="group" aria-label="Color">${COLORS.map(c=>`<button class="dds${d.color===c?' on':''}" style="--c:${c}" data-a="popcolor" data-v="${c}" aria-label="${COLOR_NAMES[c]}" aria-pressed="${d.color===c}"></button>`).join('')}</div></div>`;
   const g=document.querySelector('#popRoot .ipgrid');if(g)g.scrollTop=st;
@@ -1443,7 +1446,7 @@ function formBody(){
   return `${header}${s.from==='cal'?`${logSection(s)}<div class="divider"></div>`:''}${settings}<div class="divider"></div>${plan}${err}${del}`;
 }
 /* Bump these when you ship a change; they show at the bottom of Settings. */
-const APP_VERSION='1.2.3',APP_UPDATED='Oct 16, 2026';
+const APP_VERSION='1.2.5',APP_UPDATED='Oct 17, 2026';
 function settingsBody(){
   const c=S.sheet.confirm;
   return `<h2 class="stitle">Settings</h2>
