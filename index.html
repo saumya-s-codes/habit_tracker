@@ -621,6 +621,11 @@ button.mincol::before{content:"";position:absolute;inset:-12px -8px}   /* the ci
 button.mincol .mintxt{display:flex;flex-direction:column;line-height:1.2}
 button.mincol:active .mcircle{transform:scale(.92)}
 .mincol .mcircle.on{background:var(--deep);border-color:var(--deep);color:#fff}
+.mincol .mcircle.add{border-color:var(--deep);color:var(--deep);background:color-mix(in srgb,var(--deep) 10%,transparent)}
+.mintxt .sofar{display:block;margin-top:2px;font:600 11.5px var(--sans);font-style:normal;color:var(--deep)}
+.dlite{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:12.5px;color:var(--muted)}
+.dlite b{min-width:16px;text-align:center;font:600 14px var(--sans);color:var(--ink)}
+.dlite button{width:26px;height:26px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--muted) 45%,transparent);background:transparent;color:var(--ink);display:grid;place-items:center;padding:0;cursor:pointer}
 .mincol .mcircle.ready{border-color:var(--deep);color:var(--deep);background:color-mix(in srgb,var(--deep) 14%,transparent)}
 .mintxt{display:flex;flex-direction:column;line-height:1.2}
 .mintxt span{font:400 12.5px var(--sans);color:var(--muted)}
@@ -846,7 +851,7 @@ const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov',
 const NOW=today();
 const S={tab:'today',sheetP:0,showDone:false,habits:[],logs:{},
   cal:{id:null,view:'month',day:null,y:NOW.getFullYear(),m:NOW.getMonth()},
-  ins:{range:'month'},sheet:null,pop:null,toast:null,resetScroll:false,fxRect:null,hold:null,anim:null,quote:null,cardShown:false,cycleShown:{weekly:false,monthly:false},cycleCard:{weekly:false,monthly:false},cycleT:{},dayKey:'',name:'',lastBackup:'',settle:{},skips:{},partyHold:false,partyT:0,congaEl:null,rainT:0};
+  ins:{range:'month'},sheet:null,pop:null,toast:null,resetScroll:false,fxRect:null,hold:null,anim:null,quote:null,cardShown:false,cycleShown:{weekly:false,monthly:false},cycleCard:{weekly:false,monthly:false},cycleT:{},dayKey:'',name:'',lastBackup:'',settle:{},skips:{},lite:{},partyHold:false,partyT:0,congaEl:null,rainT:0};
 const byId=id=>S.habits.find(h=>h.id===id);
 const STORE_KEY='habit-tracker-v1';
 const hasClaudeStore=()=>typeof window!=='undefined'&&window.storage&&typeof window.storage.get==='function';
@@ -864,7 +869,7 @@ async function storeWrite(v){
 async function load(){
   try{
     const v=await storeRead();
-    if(v){const d=JSON.parse(v);S.habits=(d.habits||[]).map(yesNoNeverCounts);S.logs=d.logs||{};S.settle=d.settle||{};S.skips=d.skips||{};S.name=d.name||'';S.lastBackup=d.lastBackup||'';return}
+    if(v){const d=JSON.parse(v);S.habits=(d.habits||[]).map(yesNoNeverCounts);S.logs=d.logs||{};S.settle=d.settle||{};S.skips=d.skips||{};S.name=d.name||'';S.lastBackup=d.lastBackup||'';S.lite=d.lite||{};return}
   }catch(e){}
   seedDemo();
 }
@@ -872,7 +877,7 @@ let saveTimer;
 function save(){
   clearTimeout(saveTimer);
   saveTimer=setTimeout(async()=>{
-    try{if(hasStore())await storeWrite(JSON.stringify({habits:S.habits,logs:S.logs,settle:S.settle,skips:S.skips,name:S.name,lastBackup:S.lastBackup}))}
+    try{if(hasStore())await storeWrite(JSON.stringify({habits:S.habits,logs:S.logs,settle:S.settle,skips:S.skips,name:S.name,lastBackup:S.lastBackup,lite:S.lite}))}
     catch(e){console.error('Save failed',e)}
   },250);
 }
@@ -908,7 +913,7 @@ function seedDemo(){
     if(d.getDate()<=14&&rnd()<.09)set('budget',1);
   }
   const tk=key(t);logs.water[tk]=3;logs.read[tk]=15;logs.nosocial[tk]=1;
-  S.logs=logs;S.settle={};S.skips={};save();
+  S.logs=logs;S.settle={};S.skips={};S.lite={};save();
 }
 
 /* ---------- Core logic ---------- */
@@ -967,15 +972,21 @@ function yesNoNeverCounts(h){
 /* "1 glass", "2 glasses", "1 time": the unit loses its plural for exactly one */
 const unitFor=(n,u)=>{u=u||'';if(n!==1)return u;if(/sses$/i.test(u))return u.slice(0,-2);if(/ies$/i.test(u))return u.slice(0,-3)+'y';if(/[^s]s$/i.test(u))return u.slice(0,-1);return u};
 function minLabel(h){
-  if(h.kind==='amount')return `${fmt(need(h))} ${unitFor(need(h),h.unit)}`.trim();
+  if(h.kind==='amount')return hasTextMin(h)?h.minText:`${fmt(need(h))} ${unitFor(need(h),h.unit)}`.trim();
   if(h.period==='daily')return h.minText||'';
   const n=need(h);return `${fmt(n)} ${n===1?'time':'times'}`;
 }
+/* A daily count habit can have a written minimum instead of a smaller number (e.g. Wash face: 2 times, minimum "water only").
+   Each one you log is either the usual way or the easier way. Finishing the goal with at least one done the easier way is a minimum win. */
+const hasTextMin=h=>h.kind==='amount'&&h.period==='daily'&&!!h.minText;
+const liteOf=(h,dk)=>(S.lite[h.id]&&S.lite[h.id][dk])||0;
+function setLite(h,dk,n){const m=S.lite[h.id]||(S.lite[h.id]={});n=Math.max(0,Math.min(Math.round(n*100)/100,val(h,dk)));if(n>0)m[dk]=n;else delete m[dk];save()}
+const minWin=(h,d)=>hasTextMin(h)&&progress(h,d)>=h.goal&&liteOf(h,key(d))>0;
 const isMet=(h,d)=>progress(h,d)>=need(h);
 function level(h,d){
   const v=val(h,key(d));
   if(h.period==='daily'){
-    if(h.kind==='amount')return v>=h.goal?2:(v>=need(h)?1:0);
+    if(h.kind==='amount')return v>=h.goal?((hasTextMin(h)&&liteOf(h,key(d))>0)?1:2):(v>=need(h)?1:0);
     return v>=1?2:(v>=need(h)?1:0);
   }
   return v>0?2:0;
@@ -1023,13 +1034,14 @@ function checkins(d){let n=0;S.habits.forEach(h=>{if(level(h,d)>=1)n++});return 
 function setAmount(h,dk,v){
   const L=S.logs[h.id]||(S.logs[h.id]={});v=Math.max(0,Math.round(v*100)/100);
   if(v>0){L[dk]=v;const sk=S.skips[h.id],k2=settleKey(h,parse(dk));if(sk&&sk[k2])delete sk[k2]}else delete L[dk];   // doing it cancels a skip
+  const lm=S.lite[h.id];if(lm&&lm[dk]){if(v<=0)delete lm[dk];else if(lm[dk]>v)lm[dk]=v}   // never more "easier way" than the total
   const d=parse(dk);if(d<parse(h.created))h.created=dk;
   save();
 }
 const unitWord=h=>({daily:'days',weekly:'weeks',monthly:'months'}[h.period]);
 function goalText(h){
   const per={daily:'a day',weekly:'a week',monthly:'a month'}[h.period];
-  if(h.kind==='amount')return `${fmt(h.goal)} ${h.unit||'units'} ${per}`+(need(h)<h.goal?` (Min: ${minLabel(h)})`:'');
+  if(h.kind==='amount')return `${fmt(h.goal)} ${h.unit||'units'} ${per}`+((need(h)<h.goal||hasTextMin(h))?` (Min: ${minLabel(h)})`:'');
   if(h.period==='daily')return 'Every day'+(h.minText?` (Min: ${h.minText})`:'');
   return (h.goal===1?`Once ${per}`:`${h.goal} times ${per}`)+(need(h)<h.goal?` (Min: ${minLabel(h)})`:'');
 }
@@ -1095,7 +1107,7 @@ function change(h,dk,fn){
   else if(S.partyHold&&!celebrationReady())endParty();
   if(isT)cycleCheck(cyc0,undo);
   let tier=0;
-  if(isT){if(!b.full&&a.full)tier=3;else if(!b.met&&a.met)tier=2;else if(a.p>b.p)tier=1}
+  if(isT){if(!b.full&&a.full)tier=(hasTextMin(h)&&liteOf(h,dk)>0)?2:3;else if(!b.met&&a.met)tier=2;else if(a.p>b.p)tier=1}
   if(tier){S.anim={id:h.id,tier};setTimeout(()=>{if(S.anim&&S.anim.id===h.id)S.anim=null},950)}
   S.pop=(!b.met&&a.met)?h.id:null;if(S.pop)setTimeout(()=>{S.pop=null},500);
   if(!isMet(h,d)&&S.settle[h.id])delete S.settle[h.id][settleKey(h,d)];   // dropped back under the minimum: the choice no longer applies
@@ -1111,7 +1123,7 @@ function change(h,dk,fn){
   if(!b.met&&a.met&&a.streak>b.streak&&MILESTONES[h.period].includes(a.streak)){fxBig();buzz([18,40,18,40,30]);showToast(`${a.streak}-${U} streak on ${h.name}!`,undo);return}
   if(tier===2){fxBurst(h.color,22,[2.5,6]);buzz([10,30,12])}
   else{fxBurst(h.color,75,[4,11]);buzz([15,40,15,40,25])}
-  if(finishedNow)showToast(`Completed: ${h.name}`,undo);   // an Undo pop-up at the top
+  if(finishedNow)showToast(`${(hasTextMin(h)&&liteOf(h,dk)>0)?'Minimum win':'Completed'}: ${h.name}`,undo);   // an Undo pop-up at the top
 }
 
 /* ---------- Finishing the last task: a sloth conga line walks across, then the hammock card comes up ---------- */
@@ -1192,9 +1204,9 @@ function holdThenLeave(id){
 }
 /* Remember a habit's numbers so a completion can be undone exactly. */
 function restorePoint(h){
-  const logs={...(S.logs[h.id]||{})},settle={...(S.settle[h.id]||{})},skips={...(S.skips[h.id]||{})},created=h.created;
+  const logs={...(S.logs[h.id]||{})},settle={...(S.settle[h.id]||{})},skips={...(S.skips[h.id]||{})},lite={...(S.lite[h.id]||{})},created=h.created;
   return ()=>{
-    S.logs[h.id]=logs;S.settle[h.id]=settle;S.skips[h.id]=skips;h.created=created;save();
+    S.logs[h.id]=logs;S.settle[h.id]=settle;S.skips[h.id]=skips;S.lite[h.id]=lite;h.created=created;save();
     S.hold=null;S.anim=null;S.pop=null;
     if(S.partyHold&&!celebrationReady())endParty();
     render();
@@ -1568,13 +1580,13 @@ function skippedRowHTML(h){
 function rowHTML(h){
   if(isSkipped(h,today()))return skippedRowHTML(h);
   const t=today(),tk=key(t),v=val(h,tk),p=progress(h,t),met=isMet(h,t),full=p>=h.goal,amount=h.kind==='amount';
-  const hasMin=need(h)<h.goal,settled=isSettled(h,t),fin=isFinished(h,t);
+  const textMin=hasTextMin(h),hasMin=need(h)<h.goal||textMin,settled=isSettled(h,t),fin=isFinished(h,t);
   const per={daily:'today\u2019s',weekly:'this week\u2019s',monthly:'this month\u2019s'}[h.period];
   const perS={daily:'today',weekly:'this week',monthly:'this month'}[h.period];
   // left of the stats line: the count and bar (amounts only: a yes/no habit never shows a count)
   let left='';
   if(amount){
-    const minTick=hasMin?`<b class="tick" style="left:${need(h)/h.goal*100}%"></b>`:'';   // where the minimum sits on the bar
+    const minTick=(need(h)<h.goal)?`<b class="tick" style="left:${need(h)/h.goal*100}%"></b>`:'';   // where the minimum sits on the bar
     const today1=(h.period!=='daily'&&v>0)?`<small>${fmt(v)} today</small>`:'';
     left=`<div class="rcountcol"><span class="rcount">${fmt(p)} of ${fmt(h.goal)} ${esc(h.unit)}${today1}</span><div class="bar"><i style="width:${Math.min(100,p/h.goal*100)}%"></i>${minTick}</div></div>`;
   }
@@ -1582,7 +1594,11 @@ function rowHTML(h){
   let mincol='';
   if(hasMin){
     const ck=icon('check',16,3);
-    if(h.kind==='binary'&&h.period==='daily'){
+    if(textMin){   // a count habit with a written minimum: this button logs one the easier way
+      const mt=esc(h.minText),lt=liteOf(h,tk);
+      mincol=full?`<div class="mincol"><span class="mcircle on" aria-hidden="true">${ck}</span><div class="mintxt"><span>Minimum win</span><b>${mt}</b>${lt>0?`<em class="sofar">${fmt(lt)} this way</em>`:''}</div></div>`
+        :`<button class="mincol mbtn" data-a="addlite" data-id="${h.id}" aria-label="Log one the easier way: ${mt}"><span class="mcircle add" aria-hidden="true">${icon('plus',15,2.6)}</span><span class="mintxt"><span>Minimum win</span><b>${mt}</b>${lt>0?`<em class="sofar">${fmt(lt)} so far</em>`:''}</span></button>`;
+    }else if(h.kind==='binary'&&h.period==='daily'){
       mincol=full?`<div class="mincol"><span class="mcircle on" aria-hidden="true">${ck}</span><div class="mintxt"><span>Minimum win</span><b>${esc(h.minText)}</b></div></div>`
         :`<button class="mincol mbtn" data-a="minmark" data-id="${h.id}" aria-pressed="${v>0}" aria-label="Minimum win: ${esc(h.minText)}"><span class="mcircle${v>0?' on':''}" aria-hidden="true">${v>0?ck:''}</span><span class="mintxt"><span>Minimum win</span><b>${esc(h.minText)}</b></span></button>`;
     }else if(settled&&!full){
@@ -1713,7 +1729,7 @@ function renderCalendar(){
 function capFirst(s){return s.charAt(0).toUpperCase()+s.slice(1)}
 function legendHTML(h){
   const items=[];
-  if(h.period==='daily'&&need(h)<h.goal){
+  if(h.period==='daily'&&(need(h)<h.goal||hasTextMin(h))){
     const full=h.kind==='amount'?`Full goal (${fmt(h.goal)} ${esc(h.unit)})`:'Full';
     items.push(`<span><i class="lg1"></i>Min: ${esc(minLabel(h))}</span>`,`<span><i class="lg2"></i>${full}</span>`);
   }
@@ -1723,6 +1739,7 @@ function legendHTML(h){
 function caption(h){const c=captionBase(h);return hasSkips(h)?c+' Skipped days are left out of your rate and never break a streak.':c}
 function captionBase(h){
   const W={daily:'day',weekly:'week',monthly:'month'}[h.period];
+  if(hasTextMin(h))return `Finish ${fmt(h.goal)} ${esc(h.unit)}. If at least one is done the easier way (${esc(h.minText)}), the day counts as a minimum win; all the usual way fills it in fully.`;
   if(h.kind==='amount'&&need(h)<h.goal)return `A day counts from ${fmt(need(h))} ${esc(h.unit)}. Reaching ${fmt(h.goal)} fills the day in fully.`;
   if(h.kind==='amount')return `A ${W} counts when you reach ${fmt(h.goal)} ${esc(h.unit)}${h.period==='daily'?'':' in total'}.`;
   if(h.period==='daily')return 'A day counts when you mark it done.';
@@ -1907,13 +1924,14 @@ function logSection(s){
   if(h.period!=='daily')psum=`<div class="psum">This ${W}: <b>${h.kind==='amount'?`${fmt(p)} / ${fmt(h.goal)} ${esc(h.unit)}`:`${p} / ${h.goal} times`}</b>${p>=h.goal?' \u2013 goal reached':''}</div>`;
   return `<div style="--c:${h.color}">${ctl?`${isToday?'':`<div class="dday">${d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>`}${ctl}`:''}${psum}</div>`;
 }
-function defaultsDraft(){return {name:'',icon:'sprout',color:'#39955E',kind:'binary',period:'daily',goal:'1',unit:'',step:'1',cue:'',min:'',minText:'',identity:''}}
+function defaultsDraft(){return {name:'',icon:'sprout',color:'#39955E',kind:'binary',period:'daily',goal:'1',unit:'',step:'1',cue:'',min:'',minText:'',minMode:'amount',identity:''}}
 function formBody(){
   const s=S.sheet,d=s.draft,isNew=s.mode==='new',per={daily:'day',weekly:'week',monthly:'month'}[d.period];
   const segBtn=(k,v,l)=>`<button data-a="fset" data-k="${k}" data-v="${v}" class="${d[k]===v?'on':''}">${l}</button>`;
   const goalN=parseFloat(d.goal)||0;
-  const numMin=d.kind==='amount';
-  const textMin=d.kind==='binary'&&d.period==='daily';
+  const wayChoice=d.kind==='amount'&&d.period==='daily';   // a daily count habit chooses what its minimum is
+  const numMin=d.kind==='amount'&&!(wayChoice&&d.minMode==='text');
+  const textMin=(d.kind==='binary'&&d.period==='daily')||(wayChoice&&d.minMode==='text');
   let amt='';
   if(d.kind==='amount'){
     amt=`<div class="frow3"><div class="field"><label for="f-goal">Goal / ${per}</label><input id="f-goal" data-f="goal" inputmode="decimal" value="${esc(d.goal)}"></div>
@@ -1929,9 +1947,11 @@ function formBody(){
   const cueField=`<div class="field"><label for="f-cue">Cue</label><input id="f-cue" data-f="cue" value="${esc(d.cue)}" placeholder="After dinner" maxlength="80" autocomplete="off"></div>`;
   const minLab='Minimum';
   const minField=numMin?`<div class="field"><label for="f-min">${minLab}</label><input id="f-min" data-f="min" inputmode="decimal" value="${esc(d.min)}" placeholder="e.g. ${d.kind==='amount'?'5':'1'}"></div>`:'';
-  const minTextField=textMin?`<div class="field"><label for="f-mint">Minimum</label><input id="f-mint" data-f="minText" value="${esc(d.minText)}" placeholder="e.g. Put my phone on Do Not Disturb" maxlength="80" autocomplete="off"></div>`:'';
-  const plan=`<div class="${numMin?'frow':''}">${cueField}${minField}</div>
-    ${minTextField}
+  const minTextField=textMin?`<div class="field"><label for="f-mint">${d.kind==='amount'?'The easier way':'Minimum'}</label><input id="f-mint" data-f="minText" value="${esc(d.minText)}" placeholder="${d.kind==='amount'?'e.g. Water only, no cleanser':'e.g. Put my phone on Do Not Disturb'}" maxlength="80" autocomplete="off"></div>`:'';
+  const wayHint=(wayChoice&&d.minMode==='text')?`<div class="note" style="margin:-6px 0 12px">Log each one the usual way or the easier way. Finishing the goal with at least one done the easier way counts as a minimum win.</div>`:'';
+  const wayField=wayChoice?`<div class="field"><label>On a tough day I can</label><div class="seg">${segBtn('minMode','amount','Do less')}${segBtn('minMode','text','Do it easier')}</div></div>`:'';
+  const plan=`${wayField}<div class="${numMin?'frow':''}">${cueField}${minField}</div>
+    ${minTextField}${wayHint}
     <div class="field"><label for="f-id">Why: I\u2019m someone who\u2026</label><input id="f-id" data-f="identity" value="${esc(d.identity)}" placeholder="reads every day" maxlength="60" autocomplete="off"></div>`;
   const err=`<div class="err" id="formErr" role="alert">${esc(s.err||'')}</div>`;
   const foot=`<div class="sfoot"><button class="primary" data-a="saveForm">${isNew?'Add habit':'Save changes'}</button></div>`;
@@ -1939,11 +1959,11 @@ function formBody(){
   return `${header}${s.from==='cal'?`${logSection(s)}<div class="divider"></div>`:''}${settings}<div class="divider"></div>${plan}${err}${del}`;
 }
 /* Bump these when you ship a change; they show at the bottom of Settings. */
-const APP_VERSION='2.2.1',APP_UPDATED='Oct 26, 2026';
+const APP_VERSION='2.4.1',APP_UPDATED='Oct 26, 2026';
 /* ---------- Back up and restore ----------
    One file, always called habits-backup.json, so backing up again replaces the last one instead of piling up copies. */
 const BACKUP_NAME='habits-backup.json';
-const backupData=()=>({habits:S.habits,logs:S.logs,settle:S.settle,skips:S.skips,name:S.name});
+const backupData=()=>({habits:S.habits,logs:S.logs,settle:S.settle,skips:S.skips,lite:S.lite,name:S.name});
 const backupText=()=>JSON.stringify({app:'habits',format:1,version:APP_VERSION,exported:new Date(Date.now()).toISOString(),data:backupData()},null,2);
 async function exportBackup(){
   const text=backupText(),nav=typeof navigator!=='undefined'?navigator:{};
@@ -1972,7 +1992,7 @@ function parseBackup(text){
   if(!d||!Array.isArray(d.habits))return {error:'That file is not a Habits backup.'};
   if(d.habits.some(h=>!h||typeof h!=='object'||!h.id||!h.name))return {error:'That backup looks damaged.'};
   const obj=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
-  return {data:{habits:d.habits,logs:obj(d.logs),settle:obj(d.settle),skips:obj(d.skips),name:typeof d.name==='string'?d.name.slice(0,24):''},exported:o.exported||null,version:o.version||null};
+  return {data:{habits:d.habits,logs:obj(d.logs),settle:obj(d.settle),skips:obj(d.skips),lite:obj(d.lite),name:typeof d.name==='string'?d.name.slice(0,24):''},exported:o.exported||null,version:o.version||null};
 }
 function backupSummary(r){
   const d=r.data;let first='';
@@ -1986,13 +2006,13 @@ function applyBackup(){
   const r=S.sheet&&S.sheet.pending;if(!r)return;
   const before=JSON.stringify(backupData()),d=r.data;
   S.habits=d.habits.map(cleanHabit).map(yesNoNeverCounts).map(migrateColor);
-  S.logs=d.logs;S.settle=d.settle;S.skips=d.skips;S.name=d.name;
+  S.logs=d.logs;S.settle=d.settle;S.skips=d.skips;S.lite=d.lite;S.name=d.name;
   S.habits.forEach(h=>{if(!S.logs[h.id]||typeof S.logs[h.id]!=='object')S.logs[h.id]={}});
   S.cal.id=null;S.cal.day=null;S.hold=null;S.anim=null;S.pop=null;S.cardShown=false;S.cycleCard={weekly:false,monthly:false};S.cycleShown={weekly:false,monthly:false};S.quote=null;
   if(S.partyHold)endParty();
   save();closeSheet();render();
   showToast(`Restored ${S.habits.length} habit${S.habits.length===1?'':'s'}`,()=>{   // a way back, just in case
-    const p=JSON.parse(before);S.habits=p.habits;S.logs=p.logs;S.settle=p.settle;S.skips=p.skips;S.name=p.name;S.cal.id=null;S.cal.day=null;save();render();
+    const p=JSON.parse(before);S.habits=p.habits;S.logs=p.logs;S.settle=p.settle;S.skips=p.skips;S.lite=p.lite||{};S.name=p.name;S.cal.id=null;S.cal.day=null;save();render();
   });
 }
 function settingsBody(){
@@ -2129,6 +2149,7 @@ function dayStatus(h,d,dk){
   if(isSkipped(h,d))return `Skipped${per?' '+per:' for the day'}`;
   if(h.kind==='amount'){
     const base=`${fmt(p)} of ${fmt(h.goal)} ${esc(h.unit)}`;
+    if(hasTextMin(h)){const lt=liteOf(h,dk);return base+(lt>0?` \u00b7 ${fmt(lt)} the easier way (${esc(h.minText)})`:` \u00b7 min: ${esc(h.minText)}`)}
     return h.period==='daily'?base+(need(h)<h.goal?` \u00b7 min ${esc(minLabel(h))}`:''):`${base} ${per}`;
   }
   if(h.period==='daily')return v>=1?'Done':v>0?'Minimum done':'Not done';
@@ -2138,14 +2159,15 @@ function dayStatus(h,d,dk){
 function dayToggle(h,dk){
   const d=parse(dk),v=val(h,dk);
   if(h.kind==='binary')return setAmount(h,dk,nextBinary(h,v,true));   // none, done, minimum (when it has one)
+  if(hasTextMin(h)){if(v>=h.goal&&liteOf(h,dk)===0)return setAmount(h,dk,0);setAmount(h,dk,h.goal);return setLite(h,dk,0)}   // the check means: all the usual way
   if(h.period==='daily')return setAmount(h,dk,v>=h.goal?0:h.goal);
   if(v>0)return setAmount(h,dk,0);
   const rest=h.goal-(progress(h,d)-v);return setAmount(h,dk,rest>0?rest:(h.step||1));
 }
 function dayRow(h,d,dk){
   const v=val(h,dk),sk=isSkipped(h,d),done=dayDone(h,d,dk),amount=h.kind==='amount';
-  const full=h.period==='daily'?isFinished(h,d):v>0;
-  const half=!full&&((h.kind==='binary'&&h.period==='daily'&&v>0)||(amount&&h.period==='daily'&&isMet(h,d)&&!isFinished(h,d)));
+  const mw=minWin(h,d),full=(h.period==='daily'?(amount?progress(h,d)>=h.goal:isFinished(h,d)):v>0)&&!mw;
+  const half=mw||(!full&&((h.kind==='binary'&&h.period==='daily'&&v>0)||(amount&&h.period==='daily'&&isMet(h,d)&&progress(h,d)<h.goal)));
   const per={daily:'day',weekly:'week',monthly:'month'}[h.period],u=amount?esc(h.unit||'units'):'';
   const stepper=amount?`<div class="dstep"><button data-a="dayStep" data-id="${h.id}" data-dir="-1" aria-label="One less ${u} for ${esc(h.name)}">${icon('minus',16,2.4)}</button><input class="dnum" inputmode="decimal" data-id="${h.id}" value="${fmt(v)}" aria-label="${u} for ${esc(h.name)} on this day"><button data-a="dayStep" data-id="${h.id}" data-dir="1" aria-label="One more ${u} for ${esc(h.name)}">${icon('plus',16,2.4)}</button></div>`:'';
   const links=[];
@@ -2156,7 +2178,7 @@ function dayRow(h,d,dk){
   }
   return `<div class="dayrow${done?' done':''}${sk?' skipped':''}" style="--c:${h.color}" data-id="${h.id}">
     <button class="dchk${full?' ok':half?' mn':''}" data-a="dayCheck" data-id="${h.id}" aria-pressed="${full}" aria-label="${full?'Mark not done':'Mark done'}: ${esc(h.name)}">${(full||half)?icon('check',22,2.8):''}</button>
-    <div class="dinfo"><div class="dname">${esc(h.name)}</div><div class="dstat">${dayStatus(h,d,dk)}</div>${links.length?`<div class="dlinks">${links.join('')}</div>`:''}</div>${stepper}</div>`;
+    <div class="dinfo"><div class="dname">${esc(h.name)}</div><div class="dstat">${dayStatus(h,d,dk)}</div>${hasTextMin(h)?`<div class="dlite"><span>Easier way</span><button data-a="dayLite" data-id="${h.id}" data-dir="-1" aria-label="One less the easier way for ${esc(h.name)}">${icon('minus',13,2.6)}</button><b>${fmt(liteOf(h,dk))}</b><button data-a="dayLite" data-id="${h.id}" data-dir="1" aria-label="One more the easier way for ${esc(h.name)}">${icon('plus',13,2.6)}</button></div>`:''}${links.length?`<div class="dlinks">${links.join('')}</div>`:''}</div>${stepper}</div>`;
 }
 function dayPanel(){
   const dk=S.cal.day,d=parse(dk),isT=dk===todayKey();
@@ -2178,13 +2200,13 @@ function scrollToDay(){
   if(er.top>sr.top+sr.height*.6){const top=scr.scrollTop+(er.top-sr.top)-sr.height*.16;if(scr.scrollTo)scr.scrollTo({top,behavior:'smooth'});else scr.scrollTop=top}
 }
 function openForm(mode,h,extra){
-  const draft=h?{name:h.name,icon:h.icon,color:h.color,kind:h.kind,period:h.period,goal:String(h.goal),unit:h.unit||'',step:String(h.step||1),cue:h.cue||'',min:h.min?String(h.min):'',minText:h.minText||'',identity:h.identity||''}:defaultsDraft();
+  const draft=h?{name:h.name,icon:h.icon,color:h.color,kind:h.kind,period:h.period,goal:String(h.goal),unit:h.unit||'',step:String(h.step||1),cue:h.cue||'',min:h.min?String(h.min):'',minText:h.minText||'',minMode:(h.kind==='amount'&&h.period==='daily'&&h.minText)?'text':'amount',identity:h.identity||''}:defaultsDraft();
   openSheet({type:'form',mode,id:h&&h.id,draft,err:'',confirmDel:false,more:false,...(extra||{})});
   if(mode==='new')setTimeout(()=>{const n=$('#f-name');if(n)n.focus()},320);
 }
 function fset(k,v){
   const d=S.sheet.draft;d[k]=v;if(k==='icon'||k==='color')S.sheet.pick=null;
-  if(k==='kind'){d.goal=v==='binary'?'1':(['1','2','3'].includes(d.goal)?'10':d.goal);if(v==='amount'&&!d.step)d.step='1'}
+  if(k==='kind'){d.goal=v==='binary'?'1':(['1','2','3'].includes(d.goal)?'10':d.goal);if(v==='amount'){if(!d.step)d.step='1';d.minMode=d.minText?'text':'amount'}}
   if(k==='period'&&d.kind==='binary')d.goal='1';
   S.sheet.err='';renderSheetBody();
   if(iconPopOpen&&(k==='icon'||k==='color'))renderIconPop();   // the popup stays open and just refreshes
@@ -2196,12 +2218,13 @@ function buildHabit(d){
   if(!name)err='Give your habit a name.';
   else if(d.kind==='amount'&&!(goal>0))err='Enter a goal greater than 0.';
   else if(d.kind==='amount'&&!(step>0))err='Enter an amount greater than 0 to add per tap.';
-  const numMin=d.kind==='amount';
+  const textWay=d.kind==='amount'&&d.period==='daily'&&d.minMode==='text';
+  const numMin=d.kind==='amount'&&!textWay;
   if(!err&&numMin&&d.min.trim()!==''){const m=parseFloat(d.min);if(!(m>0&&m<goal))err='The minimum must be more than 0 and less than your goal.'}
   if(err)return {err};
   return {f:{name,icon:d.icon,color:d.color,kind:d.kind,period:d.period,
     goal:d.kind==='binary'?1:goal,unit:d.kind==='amount'?d.unit.trim():'',step:d.kind==='amount'?step:1,cue:d.cue.trim(),identity:d.identity.trim(),
-    min:(numMin&&parseFloat(d.min)>0)?parseFloat(d.min):0,minText:(d.kind==='binary'&&d.period==='daily')?d.minText.trim():''}};
+    min:(numMin&&parseFloat(d.min)>0)?parseFloat(d.min):0,minText:((d.kind==='binary'&&d.period==='daily')||textWay)?d.minText.trim():''}};
 }
 /* New habits are added with a button. Existing habits save themselves as you edit. */
 function saveForm(){
@@ -2228,6 +2251,7 @@ function act(a,ds,e){
   switch(a){
     case 'sheetToggle':snapSheet(S.sheetP?0:1);break;
     case 'exportBackup':exportBackup();break;
+    case 'addlite':change(h,tk,()=>{const st=h.step||1;setAmount(h,tk,val(h,tk)+st);setLite(h,tk,liteOf(h,tk)+st)});break;
     case 'importPick':{const f=document.querySelector('#backup-file');if(f&&f.click)f.click();break}
     case 'importCancel':if(S.sheet)S.sheet.pending=null;renderSheetBody();break;
     case 'importGo':applyBackup();break;
@@ -2303,7 +2327,7 @@ function act(a,ds,e){
     case 'saveForm':saveForm();break;
     case 'delHabit':{
       if(!S.sheet.confirmDel){S.sheet.confirmDel=true;renderSheetBody();break}
-      const id=S.sheet.id;S.habits=S.habits.filter(x=>x.id!==id);delete S.logs[id];delete S.settle[id];delete S.skips[id];if(S.cal.id===id)S.cal.id=null;save();closeSheet();render();break}
+      const id=S.sheet.id;S.habits=S.habits.filter(x=>x.id!==id);delete S.logs[id];delete S.settle[id];delete S.skips[id];delete S.lite[id];if(S.cal.id===id)S.cal.id=null;save();closeSheet();render();break}
     case 'habPrev':case 'habNext':{const i=S.habits.findIndex(x=>x.id===S.cal.id),n=S.habits.length;if(n>1){S.cal.id=S.habits[(i+(a==='habNext'?1:-1)+n)%n].id;render()}break}
     case 'calView':S.cal.view=ds.v;S.resetScroll=true;render();break;
     case 'prev':case 'next':{
@@ -2315,6 +2339,7 @@ function act(a,ds,e){
     case 'pickYear':S.cal.view='year';S.cal.y=+ds.y;S.resetScroll=true;render();break;
     case 'day':S.cal.day=S.cal.day===ds.dk?null:ds.dk;render();if(S.cal.day)scrollToDay();break;   // tap the same date again to fold it away
     case 'dayClose':S.cal.day=null;render();break;
+    case 'dayLite':{const dk=S.cal.day,st=h.step||1,dir=+ds.dir;change(h,dk,()=>{if(dir>0&&liteOf(h,dk)>=val(h,dk))setAmount(h,dk,val(h,dk)+st);setLite(h,dk,liteOf(h,dk)+dir*st)});break}
     case 'dayNav':{const nd=addDays(parse(S.cal.day),+ds.dir);if(nd>today())break;S.cal.day=key(nd);render();break}
     case 'dayCheck':{const dk=S.cal.day;change(h,dk,()=>dayToggle(h,dk));break}
     case 'dayStep':{const dk=S.cal.day;change(h,dk,()=>setAmount(h,dk,val(h,dk)+(+ds.dir)*(h.step||1)));break}
@@ -2324,7 +2349,7 @@ function act(a,ds,e){
     case 'settings':openSheet({type:'settings',confirm:null});break;
     case 'clearAll':
       if(S.sheet.confirm!=='clear'){S.sheet.confirm='clear';renderSheetBody();break}
-      S.habits=[];S.logs={};S.settle={};S.skips={};S.cal.id=null;save();closeSheet();render();showToast('Everything cleared');break;
+      S.habits=[];S.logs={};S.settle={};S.skips={};S.lite={};S.cal.id=null;save();closeSheet();render();showToast('Everything cleared');break;
   }
 }
 function wire(){
