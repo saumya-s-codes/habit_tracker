@@ -115,6 +115,11 @@ h1{font:400 28px/1.1 var(--serif);letter-spacing:-.012em;margin:0}
 .cell.l2 span,.cell.l1 span{font-size:12px}
 .cell.out{background:var(--track);color:var(--faint);border-color:transparent;cursor:default;opacity:.6}
 .cell.l1{background:color-mix(in srgb,var(--g) 34%,var(--card));border-color:color-mix(in srgb,var(--g) 55%,var(--card))}
+.cell.part{background:color-mix(in srgb,#E2A93B 30%,var(--card));border-color:color-mix(in srgb,#E2A93B 65%,var(--card))}
+.cell.part svg{color:#B07A12}
+.legend .lgP{background:color-mix(in srgb,#E2A93B 30%,var(--card));border:1px solid color-mix(in srgb,#E2A93B 65%,var(--card))}
+.mini .g i.mp{background:color-mix(in srgb,#E2A93B 75%,var(--card))}
+.strip .sp{fill:color-mix(in srgb,#E2A93B 80%,var(--card))}
 .cell.l2{background:var(--g);border-color:var(--g);color:var(--on-g);font-weight:600}
 .cell.l2 svg{color:var(--on-g)}
 .cell.today{outline:2px solid color-mix(in srgb,var(--ink) 55%,transparent);outline-offset:1px}
@@ -622,6 +627,15 @@ button.mincol .mintxt{display:flex;flex-direction:column;line-height:1.2}
 button.mincol:active .mcircle{transform:scale(.92)}
 .mincol .mcircle.on{background:var(--deep);border-color:var(--deep);color:#fff}
 .mincol .mcircle.add{border-color:var(--deep);color:var(--deep);background:color-mix(in srgb,var(--deep) 10%,transparent)}
+.pstrip{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:3px 12px;margin-top:8px;font:500 12.5px var(--sans);color:var(--muted)}
+.pleft{display:inline-flex;align-items:center;gap:5px;font-weight:600;color:var(--title)}
+.pleft svg{opacity:.7}
+.pleft.urgent{color:#B0651B}
+.plast{display:inline-flex;align-items:center;gap:6px}
+.plast::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted);opacity:.55}
+.plast.ok{color:var(--deep)}.plast.ok::before{background:var(--deep);opacity:1}
+.plast.min::before{background:#BF943B;opacity:1}
+.plast.miss::before{background:#C26A4A;opacity:1}
 .mintxt .sofar{display:block;margin-top:2px;font:600 11.5px var(--sans);font-style:normal;color:var(--deep)}
 .dlite{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:12.5px;color:var(--muted)}
 .dlite b{min-width:16px;text-align:center;font:600 14px var(--sans);color:var(--ink)}
@@ -815,6 +829,7 @@ const ICONS={
   sort:'<path d="M7 5v14M7 5L4 8M7 5l3 3M17 19V5M17 19l-3-3M17 19l3-3"/>',
   reset:'<path d="M4 12a8 8 0 1 0 2.7-6M4 4.5V9h4.5"/>',
   skip:'<path d="M5 6l7 6-7 6M13 6l7 6-7 6"/>',
+  half:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
   gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
   home:'<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>',
   clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
@@ -869,7 +884,7 @@ async function storeWrite(v){
 async function load(){
   try{
     const v=await storeRead();
-    if(v){const d=JSON.parse(v);S.habits=(d.habits||[]).map(yesNoNeverCounts);S.logs=d.logs||{};S.settle=d.settle||{};S.skips=d.skips||{};S.name=d.name||'';S.lastBackup=d.lastBackup||'';S.lite=d.lite||{};return}
+    if(v){const d=JSON.parse(v);S.habits=(d.habits||[]).map(yesNoNeverCounts).map(migrateColor);S.logs=d.logs||{};S.settle=d.settle||{};S.skips=d.skips||{};S.lite=d.lite||{};S.name=d.name||'';S.lastBackup=d.lastBackup||'';return}
   }catch(e){}
   seedDemo();
 }
@@ -1577,6 +1592,25 @@ function skippedRowHTML(h){
     <div class="rmain"><div class="rname"><span class="rn">${esc(h.name)}</span></div><span class="skiptag">Skipped ${per}</span></div>
     <button class="act undo" data-a="unskip" data-id="${h.id}" aria-label="Undo skip for ${esc(h.name)}">${icon('reset',20,2)}</button></div></div>`;
 }
+/* Weekly and monthly cards: how long is left (counting today), and how the last week or month ended,
+   so a fresh card is never a mystery. */
+function periodNote(h,t){
+  if(h.period==='daily')return '';
+  const wk=h.period==='weekly',word=wk?'week':'month',[s0,e0]=periodRange(h,t);
+  const left=Math.round((e0-t)/86400000)+1,into=Math.round((t-s0)/86400000);
+  const leftTxt=left<=1?'Last day':`${left} days left`;
+  const urgent=!isMet(h,t)&&left<=(wk?2:3);
+  const prevStart=wk?addDays(s0,-7):monthStart(addDays(s0,-1)),prevEnd=wk?addDays(prevStart,6):monthEnd(prevStart);
+  let last='';
+  if(parse(h.created)<=prevEnd){
+    const lbl=`Last ${word}`,pp=progress(h,prevStart);
+    if(isSkipped(h,prevStart))last=`<span class="plast skip">${lbl}: skipped</span>`;
+    else if(isFinished(h,prevStart))last=`<span class="plast ok">${lbl}: done</span>`;
+    else if(isMet(h,prevStart))last=`<span class="plast min">${lbl}: minimum</span>`;
+    else last=`<span class="plast miss">${lbl}: ${h.kind==='amount'?`${fmt(pp)} of ${fmt(h.goal)} ${esc(h.unit||'')}`.trim():'not done'}</span>`;
+  }
+  return `<div class="pstrip"><span class="pleft${urgent?' urgent':''}">${icon('cal',13,2)}${into===0?`New ${word} \u00b7 `:''}${leftTxt}</span>${last}</div>`;
+}
 function rowHTML(h){
   if(isSkipped(h,today()))return skippedRowHTML(h);
   const t=today(),tk=key(t),v=val(h,tk),p=progress(h,t),met=isMet(h,t),full=p>=h.goal,amount=h.kind==='amount';
@@ -1631,7 +1665,7 @@ function rowHTML(h){
   }
   return `<div class="row${met?' done':''}${met&&!full&&hasMin?' mid':''}${an}" style="--c:${h.color}" data-a="open" data-id="${h.id}" role="button" tabindex="0">
     <div class="rtopline"><div class="tile">${icon(h.icon,26)}</div>
-    <div class="rmain"><div class="rname"><span class="rn">${esc(h.name)}</span></div>${h.identity?`<div class="rwhy">I\u2019m someone who ${esc(h.identity)}.</div>`:''}</div>${btn}</div>${stats}${cue}${drawer}</div>`;
+    <div class="rmain"><div class="rname"><span class="rn">${esc(h.name)}</span></div>${h.identity?`<div class="rwhy">I\u2019m someone who ${esc(h.identity)}.</div>`:''}</div>${btn}</div>${(h.period!=='daily'&&!fin)?periodNote(h,t):''}${stats}${cue}${drawer}</div>`;
 }
 
 /* ---------- Hero quotes ---------- */
@@ -1712,18 +1746,107 @@ function renderToday(){
 
 
 /* ---------- Calendar ---------- */
+/* ---------- The whole day: full, partial or empty, across every habit ----------
+   Full: every daily habit is done (a minimum win counts as done).  Partial: something was done or started, but not everything.
+   Empty: nothing at all.  Rest: every daily habit was skipped.  Any progress counts, even a partial amount like 3 of 8 cups. */
+function dayState(d){
+  const t=today();if(d>t)return 'future';
+  const dk=key(d),hs=S.habits.filter(h=>parse(h.created)<=d);
+  if(!hs.length)return 'empty';
+  const dailies=hs.filter(h=>h.period==='daily'&&!isSkipped(h,d));
+  const touched=hs.some(h=>val(h,dk)>0||(h.period==='daily'&&isMet(h,d)));
+  if(dailies.length)return dailies.every(h=>isMet(h,d))?'full':(touched?'partial':'empty');
+  if(hs.some(h=>h.period==='daily'))return touched?'full':'rest';   // every daily habit was skipped: nothing was required
+  return touched?'full':'empty';   // only weekly or monthly habits: a check-in is enough
+}
+function wholeStats(from,to){
+  const t=today(),e=earliest(),a=from<e?e:from,b=to>t?t:to;
+  let full=0,part=0,total=0,cur=0,best=0;
+  for(let d=a;d<=b;d=addDays(d,1)){
+    const st=dayState(d);if(st==='rest')continue;
+    if(st==='full'){full++;total++;cur++;best=Math.max(best,cur)}
+    else if(key(d)===key(t)){if(st==='partial')part++}   // today is still in progress: it counts as partial but does not end a streak
+    else{total++;if(st==='partial')part++;cur=0}
+  }
+  return {full,part,total,rate:total?full/total:0,cur,best};
+}
+function wholeLegend(){
+  const items=[`<span><i class="lg2"></i>Full day</span>`,`<span><i class="lgP"></i>Partial</span>`];
+  if(S.habits.some(hasSkips))items.push(`<span><i class="lg3"></i>Rest (skipped)</span>`);
+  return `<div class="legend">${items.join('')}</div>`;
+}
+function monthAll(){
+  const t=today(),y=t.getFullYear(),m=t.getMonth(),first=new Date(y,m,1),last=monthEnd(first),dim=last.getDate();
+  const lead=(first.getDay()+6)%7,total=Math.ceil((lead+dim)/7)*7;
+  let cells='';
+  for(let i=0;i<total;i++){
+    const d=new Date(y,m,i-lead+1);
+    if(d.getMonth()!==m){cells+=`<div class="cell blank" aria-hidden="true"></div>`;continue}
+    const st=dayState(d),fut=st==='future',isT=key(d)===key(t),sel=S.cal.day===key(d);
+    const cls=st==='full'?'l2':st==='partial'?'l0 part':st==='rest'?'l0 skip':'l0';
+    const lab=d.toLocaleDateString('en-US',{month:'long',day:'numeric'})+(st==='full'?', full day':st==='partial'?', partial day':st==='rest'?', rest day':'');
+    cells+=`<button class="cell ${cls}${fut?' future':''}${isT?' today':''}${sel?' sel':''}" ${fut?'disabled':''} aria-pressed="${sel}" data-a="day" data-dk="${key(d)}" aria-label="${lab}">${st==='full'?icon('check',12,2.6):st==='partial'?icon('half',12,2):st==='rest'?icon('minus',12,2.6):''}<span>${d.getDate()}</span></button>`;
+  }
+  const ms=wholeStats(first,last),g=wholeStats(earliest(),t);
+  return `<div class="nav" style="justify-content:center"><h2>${first.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</h2></div>
+    <div class="dow">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<span>${x}</span>`).join('')}</div>
+    <div class="mgrid">${cells}</div>
+    ${wholeLegend()}
+    ${statsRow([[ms.full,'Full days'],[ms.part,'Partial days'],[g.cur,'Current streak','days']])}
+    ${S.cal.day?dayPanel():''}`;
+}
+function yearAll(){
+  const y=S.cal.y,t=today(),cy=t.getFullYear(),cr=earliest();
+  let g='';
+  for(let m=0;m<12;m++){
+    const first=new Date(y,m,1),last=monthEnd(first),lead=(first.getDay()+6)%7;
+    let c='';for(let i=0;i<lead;i++)c+='<i class="mx"></i>';
+    for(let d=1;d<=last.getDate();d++){const st=dayState(new Date(y,m,d));c+=`<i class="${st==='full'?'m2':st==='partial'?'mp':st==='future'?'mf':st==='rest'?'ms':''}"></i>`}
+    const ms=wholeStats(first,last);
+    g+=`<div class="mini${y===cy&&m===t.getMonth()?' cur':''}" role="group" aria-label="${MONTHS[m]} ${y}"><div class="mh"><span>${MONTHS[m]}</span><em>${ms.total?Math.round(ms.rate*100)+'%':'\u2013'}</em></div><div class="g">${c}</div></div>`;
+  }
+  const ys=wholeStats(new Date(y,0,1),new Date(y,11,31)),gs=wholeStats(earliest(),y===cy?t:new Date(y,11,31));
+  return `<div class="nav"><button class="iconbtn" data-a="prev" aria-label="Previous year" ${y<=cr.getFullYear()?'disabled':''}>${icon('chevL',18)}</button><h2>${y}</h2><button class="iconbtn" data-a="next" aria-label="Next year" ${y>=cy?'disabled':''}>${icon('chevR',18)}</button></div>
+    ${wholeLegend()}<div class="ygrid">${g}</div>
+    ${statsRow([[ys.full,'Full days'],[ys.part,'Partial days'],[gs.cur,y===cy?'Current streak':'Final streak','days'],[ys.best,'Longest streak','days']])}`;
+}
+function yearStripAll(y){
+  const t=today(),off=(new Date(y,0,1).getDay()+6)%7,days=(y%4===0&&(y%100!==0||y%400===0))?366:365;let r='';
+  for(let i=0;i<days;i++){
+    const d=new Date(y,0,1+i),col=Math.floor((i+off)/7),row=(i+off)%7,st=dayState(d);
+    const c=st==='full'?'s2':st==='partial'?'sp':st==='future'?'s-1':st==='rest'?'sk':'s0';
+    r+=`<rect x="${col*7}" y="${row*7}" width="6" height="6" rx="1.5" class="${c}"/>`;
+  }
+  return `<svg viewBox="0 0 371 49" class="strip" aria-hidden="true">${r}</svg>`;
+}
+function allAll(){
+  const t=today(),cr=earliest(),st=wholeStats(cr,t);
+  const tiles=`<div class="tiles">
+    <div class="card tilecard"><div class="ringwrap" style="width:44px;height:44px">${ringSVG(st.rate,44,5)}</div><div><b>${st.total?Math.round(st.rate*100)+'%':'\u2013'}</b><span>Full-day rate</span></div></div>
+    <div class="card tilecard"><span class="ti">${icon('chart',28,1.8)}</span><div><b>${st.full}</b><span>Full days</span></div></div>
+    <div class="card tilecard"><span class="ti" style="color:#F26A3D">${icon('flame',28,1.8)}</span><div><b>${st.cur}</b><span>Current streak (days)</span></div></div>
+    <div class="card tilecard"><span class="ti" style="color:#E6A100">${icon('trophy',28,1.8)}</span><div><b>${st.best}</b><span>Longest streak (days)</span></div></div></div>`;
+  let rows='';
+  for(let y=t.getFullYear();y>=cr.getFullYear();y--){
+    const ys=wholeStats(new Date(y,0,1),new Date(y,11,31));
+    rows+=`<button class="yrow" data-a="pickYear" data-y="${y}"><div class="yh"><b>${y}</b><span>${ys.total?Math.round(ys.rate*100)+'%':'\u2013'}</span></div>${yearStripAll(y)}<div class="ys">${ys.full} full, ${ys.part} partial</div></button>`;
+  }
+  return tiles+`<div class="h3">Activity</div>${wholeLegend()}${rows}`;
+}
 function renderCalendar(){
   const head=`<div class="hdr"><div><h1>Calendar</h1></div></div>`;
   if(!S.habits.length)return head+emptyCard();
-  let h=byId(S.cal.id);if(!h){h=S.habits[0];S.cal.id=h.id}
-  const n=S.habits.length;
-  const picker=`<div class="hnav" style="--c:${h.color}"><button class="iconbtn" data-a="habPrev" ${n<2?'disabled':''} aria-label="Previous habit">${icon('chevL',18)}</button>
-    <button class="hcur" data-a="habPop" aria-haspopup="dialog" aria-label="Choose a habit. Current: ${esc(h.name)}"><div class="hr"><span class="pi">${icon(h.icon,20)}</span><span class="pn">${esc(h.name)}</span><span class="hc">${icon('chevD',16)}</span></div><span class="hs">${goalText(h)}</span></button>
-    <button class="iconbtn" data-a="habNext" ${n<2?'disabled':''} aria-label="Next habit">${icon('chevR',18)}</button></div>`;
+  let h=(S.cal.id&&S.cal.id!=='all')?byId(S.cal.id):null;
+  const all=!h;if(all)S.cal.id='all';   // by default the calendar shows the whole day
+  const color=all?'#16503C':h.color;
+  const picker=`<div class="hnav" style="--c:${color}"><button class="iconbtn" data-a="habPrev" aria-label="Previous view">${icon('chevL',18)}</button>
+    <button class="hcur" data-a="habPop" aria-haspopup="dialog" aria-label="Choose what to show. Current: ${all?'All habits':esc(h.name)}"><div class="hr"><span class="pi">${icon(all?'cal':h.icon,20)}</span><span class="pn">${all?'All habits':esc(h.name)}</span><span class="hc">${icon('chevD',16)}</span></div><span class="hs">${all?'Every habit, day by day':goalText(h)}</span></button>
+    <button class="iconbtn" data-a="habNext" aria-label="Next view">${icon('chevR',18)}</button></div>`;
   const seg=`<div class="seg" style="margin-top:14px">${[['month','Month'],['year','Year'],['all','All time']].map(([v,l])=>`<button data-a="calView" data-v="${v}" class="${S.cal.view===v?'on':''}">${l}</button>`).join('')}</div>`;
   let body='';
-  if(S.cal.view==='month')body=monthView(h);else if(S.cal.view==='year')body=yearView(h);else body=allView(h);
-  return `<div style="--c:${h.color}">${head}
+  if(all)body=S.cal.view==='month'?monthAll():S.cal.view==='year'?yearAll():allAll();
+  else body=S.cal.view==='month'?monthView(h):S.cal.view==='year'?yearView(h):allView(h);
+  return `<div style="--c:${color}">${head}
     ${picker}${seg}${body}</div>`;
 }
 function capFirst(s){return s.charAt(0).toUpperCase()+s.slice(1)}
@@ -1885,8 +2008,8 @@ function openIconPop(){
 }
 function openHabPop(){
   iconPopOpen=true;
-  $('#popRoot').innerHTML=`<div class="scrim popscrim" data-a="closePop"></div><div class="iconpop habpop" role="dialog" aria-modal="true" aria-label="Choose a habit"><h3>Choose a habit</h3>
-    <div class="hplist">${S.habits.map(x=>`<button class="hpitem${x.id===S.cal.id?' on':''}" style="--c:${x.color}" data-a="habPick" data-id="${x.id}"><span class="tile sm">${icon(x.icon,18)}</span><span class="hpn"><b>${esc(x.name)}</b><small>${goalText(x)}</small></span>${x.id===S.cal.id?`<span class="hpk">${icon('check',18,2.4)}</span>`:''}</button>`).join('')}</div></div>`;
+  $('#popRoot').innerHTML=`<div class="scrim popscrim" data-a="closePop"></div><div class="iconpop habpop" role="dialog" aria-modal="true" aria-label="Choose a habit"><h3>What to show</h3>
+    <div class="hplist">${[{id:'all',name:'All habits',sub:'Every habit, day by day',icon:'cal',color:'#16503C'},...S.habits.map(x=>({id:x.id,name:x.name,sub:goalText(x),icon:x.icon,color:x.color}))].map(x=>`<button class="hpitem${x.id===(S.cal.id||'all')?' on':''}" style="--c:${x.color}" data-a="habPick" data-id="${x.id}"><span class="tile sm">${icon(x.icon,18)}</span><span class="hpn"><b>${esc(x.name)}</b><small>${x.sub}</small></span>${x.id===(S.cal.id||'all')?`<span class="hpk">${icon('check',18,2.4)}</span>`:''}</button>`).join('')}</div></div>`;
 }
 function closeIconPop(){iconPopOpen=false;bindVV(false);$('#popRoot').innerHTML=''}
 
@@ -1959,7 +2082,7 @@ function formBody(){
   return `${header}${s.from==='cal'?`${logSection(s)}<div class="divider"></div>`:''}${settings}<div class="divider"></div>${plan}${err}${del}`;
 }
 /* Bump these when you ship a change; they show at the bottom of Settings. */
-const APP_VERSION='2.4.1',APP_UPDATED='Oct 26, 2026';
+const APP_VERSION='2.6.0',APP_UPDATED='Oct 31, 2026';
 /* ---------- Back up and restore ----------
    One file, always called habits-backup.json, so backing up again replaces the last one instead of piling up copies. */
 const BACKUP_NAME='habits-backup.json';
@@ -2328,7 +2451,7 @@ function act(a,ds,e){
     case 'delHabit':{
       if(!S.sheet.confirmDel){S.sheet.confirmDel=true;renderSheetBody();break}
       const id=S.sheet.id;S.habits=S.habits.filter(x=>x.id!==id);delete S.logs[id];delete S.settle[id];delete S.skips[id];delete S.lite[id];if(S.cal.id===id)S.cal.id=null;save();closeSheet();render();break}
-    case 'habPrev':case 'habNext':{const i=S.habits.findIndex(x=>x.id===S.cal.id),n=S.habits.length;if(n>1){S.cal.id=S.habits[(i+(a==='habNext'?1:-1)+n)%n].id;render()}break}
+    case 'habPrev':case 'habNext':{const ids=['all',...S.habits.map(x=>x.id)],i=Math.max(0,ids.indexOf(S.cal.id||'all')),n=ids.length;if(n>1){S.cal.id=ids[(i+(a==='habNext'?1:-1)+n)%n];render()}break}
     case 'calView':S.cal.view=ds.v;S.resetScroll=true;render();break;
     case 'prev':case 'next':{
       const dir=a==='next'?1:-1;
