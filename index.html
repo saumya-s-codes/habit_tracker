@@ -115,11 +115,11 @@ h1{font:400 28px/1.1 var(--serif);letter-spacing:-.012em;margin:0}
 .cell.l2 span,.cell.l1 span{font-size:12px}
 .cell.out{background:var(--track);color:var(--faint);border-color:transparent;cursor:default;opacity:.6}
 .cell.l1{background:color-mix(in srgb,var(--g) 34%,var(--card));border-color:color-mix(in srgb,var(--g) 55%,var(--card))}
-.cell.part{background:color-mix(in srgb,#E2A93B 30%,var(--card));border-color:color-mix(in srgb,#E2A93B 65%,var(--card))}
-.cell.part svg{color:#B07A12}
-.legend .lgP{background:color-mix(in srgb,#E2A93B 30%,var(--card));border:1px solid color-mix(in srgb,#E2A93B 65%,var(--card))}
-.mini .g i.mp{background:color-mix(in srgb,#E2A93B 75%,var(--card))}
-.strip .sp{fill:color-mix(in srgb,#E2A93B 80%,var(--card))}
+.cell.part{background:color-mix(in srgb,var(--g) 34%,var(--card));border-color:color-mix(in srgb,var(--g) 55%,var(--card))}
+.cell.part svg{color:var(--g)}
+.legend .lgP{background:color-mix(in srgb,var(--g) 34%,var(--card));border:1px solid color-mix(in srgb,var(--g) 55%,var(--card))}
+.mini .g i.mp{background:color-mix(in srgb,var(--g) 45%,var(--card))}
+.strip .sp{fill:color-mix(in srgb,var(--g) 55%,var(--card))}
 .cell.l2{background:var(--g);border-color:var(--g);color:var(--on-g);font-weight:600}
 .cell.l2 svg{color:var(--on-g)}
 .cell.today{outline:2px solid color-mix(in srgb,var(--ink) 55%,transparent);outline-offset:1px}
@@ -636,6 +636,8 @@ button.mincol:active .mcircle{transform:scale(.92)}
 .plast.ok{color:var(--deep)}.plast.ok::before{background:var(--deep);opacity:1}
 .plast.min::before{background:#BF943B;opacity:1}
 .plast.miss::before{background:#C26A4A;opacity:1}
+.row.done.mid{background:color-mix(in srgb,var(--g) 11%,var(--card2));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--g) 38%,transparent),0 2px 12px rgba(80,60,30,.06)}
+.plast.min::before{background:color-mix(in srgb,var(--g) 55%,var(--card));box-shadow:inset 0 0 0 1.5px var(--g);opacity:1}
 .mintxt .sofar{display:block;margin-top:2px;font:600 11.5px var(--sans);font-style:normal;color:var(--deep)}
 .dlite{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:12.5px;color:var(--muted)}
 .dlite b{min-width:16px;text-align:center;font:600 14px var(--sans);color:var(--ink)}
@@ -745,6 +747,36 @@ button.mincol:active .mcircle{transform:scale(.92)}
 .dstep{flex:none;display:flex;align-items:center;gap:6px}
 .dstep button{width:34px;height:34px;border-radius:50%;border:1.5px solid color-mix(in srgb,var(--muted) 45%,transparent);background:transparent;color:var(--ink);display:grid;place-items:center;padding:0;cursor:pointer}
 .dnum{width:52px;height:36px;text-align:center;border:1.5px solid color-mix(in srgb,var(--muted) 35%,transparent);border-radius:10px;background:var(--bg);color:var(--ink);font:600 16px var(--sans);padding:0}
+/* Calendar: the line that says what is shown, the floating button and the picker sheet */
+.vsub{margin:6px 2px 2px;font-size:13.5px;color:var(--muted)}
+.vsub b{color:var(--ink);font-weight:600}.vsub span{margin-left:4px}
+#app[data-tab="calendar"] #screen{padding-bottom:178px}
+.fab{position:absolute;right:16px;bottom:calc(env(safe-area-inset-bottom) + 92px);z-index:6;display:inline-flex;align-items:center;gap:8px;max-width:calc(100% - 32px);padding:11px 13px 11px 14px;border-radius:999px;border:1.5px solid var(--c);background:color-mix(in srgb,var(--c) 14%,var(--card2));color:var(--ink);font:600 14px var(--sans);box-shadow:0 8px 22px rgba(50,38,20,.2);cursor:pointer}
+.fab[hidden]{display:none}
+.fab svg{color:var(--c);flex:none}
+.fab span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
+.fab .fabc{display:inline-flex;transform:rotate(180deg)}
+.pksheet{position:absolute;left:0;right:0;bottom:0;z-index:51;max-height:80%;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.2);padding:8px 10px calc(env(safe-area-inset-bottom) + 12px);animation:pksUp .24s ease-out}
+@keyframes pksUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.pkgrab{width:38px;height:4px;border-radius:3px;background:color-mix(in srgb,var(--muted) 40%,transparent);margin:0 auto 4px;flex:none}
+.pksheet h3{font:400 18px var(--serif);margin:0;padding:6px 10px 8px;flex:none}
+.pksearch{display:flex;align-items:center;gap:8px;margin:0 6px 6px;padding:0 12px;height:42px;border-radius:12px;background:var(--card2);border:1px solid var(--line);flex:none;color:var(--muted)}
+.pksearch input{flex:1;min-width:0;border:0;background:none;outline:none;font:400 16px var(--sans);color:var(--ink)}
+.pklist{overflow-y:auto;flex:1;min-height:0;padding:0 4px 6px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.pkh{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:12px 10px 4px}
+.pkrow{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:9px 10px;background:none;border:0;border-radius:14px;text-align:left;cursor:pointer;color:var(--ink)}
+.pkrow.on{background:color-mix(in srgb,var(--c) 10%,var(--card))}
+.pkn{flex:1;min-width:0;display:flex;flex-direction:column}
+.pkn b{font:600 15px var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pkn small{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pks{font-size:12.5px;color:var(--muted);flex:none}
+.pkrec{display:flex;flex-wrap:wrap;gap:8px;padding:2px 10px 4px}
+.pkchip{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:8px 12px;border-radius:999px;border:1.5px solid color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 10%,var(--card2));color:var(--ink);font:600 13.5px var(--sans);cursor:pointer}
+.pkchip svg{color:var(--c);flex:none}.pkchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pkempty{text-align:center;color:var(--muted);padding:24px 8px}
+/* the minimum is light green everywhere, whatever colour the habit is (kept last so nothing above can override it) */
+.dayrow.min,.dayrow.done.min{background:color-mix(in srgb,var(--g) 11%,var(--card2));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--g) 38%,transparent)}
+.dchk.mn{background:color-mix(in srgb,var(--g) 30%,var(--card2));border-color:var(--g);color:var(--g)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -756,6 +788,7 @@ button.mincol:active .mcircle{transform:scale(.92)}
     <main id="screen"></main>
   </div>
   <nav class="tabbar" id="tabbar" aria-label="Main"></nav>
+  <button class="fab" id="fab" data-a="habPop" type="button" hidden></button>
   <div id="toast" aria-live="polite"></div>
   <div id="sheetRoot"></div>
   <div id="popRoot"></div>
@@ -830,6 +863,7 @@ const ICONS={
   reset:'<path d="M4 12a8 8 0 1 0 2.7-6M4 4.5V9h4.5"/>',
   skip:'<path d="M5 6l7 6-7 6M13 6l7 6-7 6"/>',
   half:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
+  search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
   gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
   home:'<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>',
   clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
@@ -1138,7 +1172,7 @@ function change(h,dk,fn){
   if(!b.met&&a.met&&a.streak>b.streak&&MILESTONES[h.period].includes(a.streak)){fxBig();buzz([18,40,18,40,30]);showToast(`${a.streak}-${U} streak on ${h.name}!`,undo);return}
   if(tier===2){fxBurst(h.color,22,[2.5,6]);buzz([10,30,12])}
   else{fxBurst(h.color,75,[4,11]);buzz([15,40,15,40,25])}
-  if(finishedNow)showToast(`${(hasTextMin(h)&&liteOf(h,dk)>0)?'Minimum win':'Completed'}: ${h.name}`,undo);   // an Undo pop-up at the top
+  if(finishedNow)showToast(`${(!a.full)?'Win claimed':((hasTextMin(h)&&liteOf(h,dk)>0)?'Minimum win':'Completed')}: ${h.name}`,undo);   // an Undo pop-up at the top
 }
 
 /* ---------- Finishing the last task: a sloth conga line walks across, then the hammock card comes up ---------- */
@@ -1632,9 +1666,12 @@ function rowHTML(h){
       const mt=esc(h.minText),lt=liteOf(h,tk);
       mincol=full?`<div class="mincol"><span class="mcircle on" aria-hidden="true">${ck}</span><div class="mintxt"><span>Minimum win</span><b>${mt}</b>${lt>0?`<em class="sofar">${fmt(lt)} this way</em>`:''}</div></div>`
         :`<button class="mincol mbtn" data-a="addlite" data-id="${h.id}" aria-label="Log one the easier way: ${mt}"><span class="mcircle add" aria-hidden="true">${icon('plus',15,2.6)}</span><span class="mintxt"><span>Minimum win</span><b>${mt}</b>${lt>0?`<em class="sofar">${fmt(lt)} so far</em>`:''}</span></button>`;
-    }else if(h.kind==='binary'&&h.period==='daily'){
-      mincol=full?`<div class="mincol"><span class="mcircle on" aria-hidden="true">${ck}</span><div class="mintxt"><span>Minimum win</span><b>${esc(h.minText)}</b></div></div>`
-        :`<button class="mincol mbtn" data-a="minmark" data-id="${h.id}" aria-pressed="${v>0}" aria-label="Minimum win: ${esc(h.minText)}"><span class="mcircle${v>0?' on':''}" aria-hidden="true">${v>0?ck:''}</span><span class="mintxt"><span>Minimum win</span><b>${esc(h.minText)}</b></span></button>`;
+    }else if(h.kind==='binary'&&h.period==='daily'){   // a yes/no habit with a written minimum
+      const mt=esc(h.minText);
+      mincol=full?`<div class="mincol"><span class="mcircle on" aria-hidden="true">${ck}</span><div class="mintxt"><span>Minimum win</span><b>${mt}</b></div></div>`
+        :(v>0&&settled)?`<div class="mincol"><span class="mcircle on" aria-hidden="true">${ck}</span><div class="mintxt"><span>Win claimed</span><b>${mt}</b><button class="minchip go" data-a="unsettle" data-id="${h.id}">Keep going</button></div></div>`
+        :v>0?`<button class="mincol mbtn win" data-a="settle" data-id="${h.id}" aria-label="Claim the minimum win: ${mt}"><span class="mcircle ready" aria-hidden="true">${ck}</span><span class="mintxt"><span>Minimum win</span><b class="claim">Tap to claim</b></span></button>`
+        :`<button class="mincol mbtn" data-a="minmark" data-id="${h.id}" aria-label="Minimum win: ${mt}. Tap to log it and finish"><span class="mcircle" aria-hidden="true"></span><span class="mintxt"><span>Minimum win</span><b>${mt}</b></span></button>`;
     }else if(settled&&!full){
       mincol=`<div class="mincol"><span class="mcircle on" aria-hidden="true">${ck}</span><div class="mintxt"><span>Win claimed</span><b>${esc(minLabel(h))} achieved</b><button class="minchip go" data-a="unsettle" data-id="${h.id}">Keep going</button></div></div>`;
     }else if(met&&!full){
@@ -1839,9 +1876,7 @@ function renderCalendar(){
   let h=(S.cal.id&&S.cal.id!=='all')?byId(S.cal.id):null;
   const all=!h;if(all)S.cal.id='all';   // by default the calendar shows the whole day
   const color=all?'#16503C':h.color;
-  const picker=`<div class="hnav" style="--c:${color}"><button class="iconbtn" data-a="habPrev" aria-label="Previous view">${icon('chevL',18)}</button>
-    <button class="hcur" data-a="habPop" aria-haspopup="dialog" aria-label="Choose what to show. Current: ${all?'All habits':esc(h.name)}"><div class="hr"><span class="pi">${icon(all?'cal':h.icon,20)}</span><span class="pn">${all?'All habits':esc(h.name)}</span><span class="hc">${icon('chevD',16)}</span></div><span class="hs">${all?'Every habit, day by day':goalText(h)}</span></button>
-    <button class="iconbtn" data-a="habNext" aria-label="Next view">${icon('chevR',18)}</button></div>`;
+  const picker=`<div class="vsub">Showing <b>${all?'All habits':esc(h.name)}</b> <span>${all?'Every habit, day by day':goalText(h)}</span></div>`;
   const seg=`<div class="seg" style="margin-top:14px">${[['month','Month'],['year','Year'],['all','All time']].map(([v,l])=>`<button data-a="calView" data-v="${v}" class="${S.cal.view===v?'on':''}">${l}</button>`).join('')}</div>`;
   let body='';
   if(all)body=S.cal.view==='month'?monthAll():S.cal.view==='year'?yearAll():allAll();
@@ -2006,12 +2041,35 @@ function openIconPop(){
   if(!S.sheet||!S.sheet.draft)return;
   iconPopOpen=true;renderIconPop();
 }
-function openHabPop(){
-  iconPopOpen=true;
-  $('#popRoot').innerHTML=`<div class="scrim popscrim" data-a="closePop"></div><div class="iconpop habpop" role="dialog" aria-modal="true" aria-label="Choose a habit"><h3>What to show</h3>
-    <div class="hplist">${[{id:'all',name:'All habits',sub:'Every habit, day by day',icon:'cal',color:'#16503C'},...S.habits.map(x=>({id:x.id,name:x.name,sub:goalText(x),icon:x.icon,color:x.color}))].map(x=>`<button class="hpitem${x.id===(S.cal.id||'all')?' on':''}" style="--c:${x.color}" data-a="habPick" data-id="${x.id}"><span class="tile sm">${icon(x.icon,18)}</span><span class="hpn"><b>${esc(x.name)}</b><small>${x.sub}</small></span>${x.id===(S.cal.id||'all')?`<span class="hpk">${icon('check',18,2.4)}</span>`:''}</button>`).join('')}</div></div>`;
+/* The picker: a sheet with search, your recent habits, then every habit grouped by how often it repeats. Built for many habits. */
+function noteRecent(id){if(id==='all')return;S.calRecent=[id,...(S.calRecent||[]).filter(x=>x!==id)].slice(0,4)}
+function pickListHTML(){
+  const q=(S.pickQ||'').trim().toLowerCase(),cur=S.cal.id||'all',t=today();
+  const match=h=>!q||h.name.toLowerCase().includes(q);
+  const streak=x=>{const c=habitStats(x,parse(x.created),t).cur,u=unitWord(x);return c>0?`${c} ${c===1?u.slice(0,-1):u}`:''};
+  const row=(id,ic,color,name,sub,right)=>`<button class="pkrow${cur===id?' on':''}" style="--c:${color}" data-a="habPick" data-id="${id}"><span class="tile sm">${icon(ic,18)}</span><span class="pkn"><b>${esc(name)}</b><small>${sub}</small></span>${right?`<span class="pks">${right}</span>`:''}${cur===id?`<span class="hpk">${icon('check',18,2.4)}</span>`:''}</button>`;
+  let h='';
+  if(!q||'all habits'.includes(q))h+=row('all','cal','#16503C','All habits','Every habit, day by day','');
+  const rec=(S.calRecent||[]).map(byId).filter(Boolean).filter(x=>x.id!==cur);
+  if(!q&&S.habits.length>=6&&rec.length)h+=`<div class="pkh">Recent</div><div class="pkrec">${rec.map(x=>`<button class="pkchip" style="--c:${x.color}" data-a="habPick" data-id="${x.id}">${icon(x.icon,16)}<span>${esc(x.name)}</span></button>`).join('')}</div>`;
+  for(const [per,label] of [['daily','Daily'],['weekly','Weekly'],['monthly','Monthly']]){
+    const hs=S.habits.filter(x=>x.period===per&&match(x));if(!hs.length)continue;
+    h+=`<div class="pkh">${label}</div>`+hs.map(x=>row(x.id,x.icon,x.color,x.name,goalText(x),streak(x))).join('');
+  }
+  return h||`<p class="pkempty">No habit matches \u201c${esc(S.pickQ)}\u201d.</p>`;
 }
-function closeIconPop(){iconPopOpen=false;bindVV(false);$('#popRoot').innerHTML=''}
+function placePk(){   // keep the sheet above the keyboard while you type in the search box
+  const sh=document.querySelector('.pksheet'),vv=window.visualViewport;if(!sh||!vv||!sh.style)return;
+  sh.style.bottom=Math.max(0,Math.round(window.innerHeight-vv.height-vv.offsetTop))+'px';
+  sh.style.maxHeight=Math.max(240,Math.round(vv.height*0.82))+'px';
+}
+function unbindPk(){const vv=window.visualViewport;if(vv&&vv.removeEventListener){vv.removeEventListener('resize',placePk);vv.removeEventListener('scroll',placePk)}}
+function openHabPop(){
+  iconPopOpen=true;S.pickQ='';const n=S.habits.length;
+  $('#popRoot').innerHTML=`<div class="scrim popscrim" data-a="closePop"></div><div class="pksheet" role="dialog" aria-modal="true" aria-label="Choose what to show"><div class="pkgrab" aria-hidden="true"></div><h3>What to show</h3>${n>=8?`<label class="pksearch">${icon('search',16)}<input id="pk-q" type="search" placeholder="Search ${n} habits" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Search habits"></label>`:''}<div class="pklist" id="pk-list">${pickListHTML()}</div></div>`;
+  const vv=window.visualViewport;if(vv&&vv.addEventListener){unbindPk();vv.addEventListener('resize',placePk);vv.addEventListener('scroll',placePk)}
+}
+function closeIconPop(){iconPopOpen=false;bindVV(false);unbindPk();$('#popRoot').innerHTML=''}
 
 /* ---------- Sheets ---------- */
 function openSheet(s){
@@ -2082,7 +2140,7 @@ function formBody(){
   return `${header}${s.from==='cal'?`${logSection(s)}<div class="divider"></div>`:''}${settings}<div class="divider"></div>${plan}${err}${del}`;
 }
 /* Bump these when you ship a change; they show at the bottom of Settings. */
-const APP_VERSION='2.6.0',APP_UPDATED='Oct 31, 2026';
+const APP_VERSION='2.8.0',APP_UPDATED='Nov 2, 2026';
 /* ---------- Back up and restore ----------
    One file, always called habits-backup.json, so backing up again replaces the last one instead of piling up copies. */
 const BACKUP_NAME='habits-backup.json';
@@ -2170,6 +2228,16 @@ function showToast(msg,undo){
 function renderTabs(){
   $('#tabbar').innerHTML=[['today','Today','home'],['calendar','Calendar','cal'],['insights','Insights','bars']]
     .map(([t,l,i])=>`<button class="tab${S.tab===t?' on':''}" data-a="tab" data-t="${t}" ${S.tab===t?'aria-current="page"':''}>${icon(i,24,1.7)}<span>${l}</span></button>`).join('');
+  renderFab();
+}
+/* The Calendar's floating button: shows what you are looking at, and opens the picker */
+function renderFab(){
+  const b=$('#fab');if(!b)return;
+  if(!(S.tab==='calendar'&&S.habits.length>0)){b.hidden=true;b.innerHTML='';return}
+  const h=(S.cal.id&&S.cal.id!=='all')?byId(S.cal.id):null;
+  b.hidden=false;if(b.style&&b.style.setProperty)b.style.setProperty('--c',h?h.color:'#16503C');
+  if(b.setAttribute)b.setAttribute('aria-label','Choose what to show. Showing '+(h?h.name:'all habits'));
+  b.innerHTML=`${icon(h?h.icon:'cal',18)}<span>${esc(h?h.name:'All habits')}</span><i class="fabc">${icon('chevD',16)}</i>`;
 }
 function renderMain(){
   swipeOpen=null;if(!S.dayKey)S.dayKey=todayKey();
@@ -2281,7 +2349,7 @@ function dayStatus(h,d,dk){
 /* what the big check does for each kind of habit */
 function dayToggle(h,dk){
   const d=parse(dk),v=val(h,dk);
-  if(h.kind==='binary')return setAmount(h,dk,nextBinary(h,v,true));   // none, done, minimum (when it has one)
+  if(h.kind==='binary'){const nv=nextBinary(h,v,true);setAmount(h,dk,nv);if(nv===0.5&&h.period==='daily'){const m=S.settle[h.id]||(S.settle[h.id]={});m[settleKey(h,d)]=1;save()}return}   // none, done, minimum (a minimum counts as done)
   if(hasTextMin(h)){if(v>=h.goal&&liteOf(h,dk)===0)return setAmount(h,dk,0);setAmount(h,dk,h.goal);return setLite(h,dk,0)}   // the check means: all the usual way
   if(h.period==='daily')return setAmount(h,dk,v>=h.goal?0:h.goal);
   if(v>0)return setAmount(h,dk,0);
@@ -2289,7 +2357,7 @@ function dayToggle(h,dk){
 }
 function dayRow(h,d,dk){
   const v=val(h,dk),sk=isSkipped(h,d),done=dayDone(h,d,dk),amount=h.kind==='amount';
-  const mw=minWin(h,d),full=(h.period==='daily'?(amount?progress(h,d)>=h.goal:isFinished(h,d)):v>0)&&!mw;
+  const mw=minWin(h,d),full=(h.period==='daily'?progress(h,d)>=h.goal:v>0)&&!mw;
   const half=mw||(!full&&((h.kind==='binary'&&h.period==='daily'&&v>0)||(amount&&h.period==='daily'&&isMet(h,d)&&progress(h,d)<h.goal)));
   const per={daily:'day',weekly:'week',monthly:'month'}[h.period],u=amount?esc(h.unit||'units'):'';
   const stepper=amount?`<div class="dstep"><button data-a="dayStep" data-id="${h.id}" data-dir="-1" aria-label="One less ${u} for ${esc(h.name)}">${icon('minus',16,2.4)}</button><input class="dnum" inputmode="decimal" data-id="${h.id}" value="${fmt(v)}" aria-label="${u} for ${esc(h.name)} on this day"><button data-a="dayStep" data-id="${h.id}" data-dir="1" aria-label="One more ${u} for ${esc(h.name)}">${icon('plus',16,2.4)}</button></div>`:'';
@@ -2299,7 +2367,7 @@ function dayRow(h,d,dk){
     if(!isMet(h,d))links.push(`<button class="dlink" data-a="daySkip" data-id="${h.id}">Skip this ${per}</button>`);
     if(amount&&need(h)<h.goal&&isMet(h,d)&&progress(h,d)<h.goal)links.push(`<button class="dlink" data-a="dayClaim" data-id="${h.id}">${isSettled(h,d)?'Counted \u00b7 Undo':'Count as done'}</button>`);
   }
-  return `<div class="dayrow${done?' done':''}${sk?' skipped':''}" style="--c:${h.color}" data-id="${h.id}">
+  return `<div class="dayrow${done?' done':''}${half?' min':''}${sk?' skipped':''}" style="--c:${h.color}" data-id="${h.id}">
     <button class="dchk${full?' ok':half?' mn':''}" data-a="dayCheck" data-id="${h.id}" aria-pressed="${full}" aria-label="${full?'Mark not done':'Mark done'}: ${esc(h.name)}">${(full||half)?icon('check',22,2.8):''}</button>
     <div class="dinfo"><div class="dname">${esc(h.name)}</div><div class="dstat">${dayStatus(h,d,dk)}</div>${hasTextMin(h)?`<div class="dlite"><span>Easier way</span><button data-a="dayLite" data-id="${h.id}" data-dir="-1" aria-label="One less the easier way for ${esc(h.name)}">${icon('minus',13,2.6)}</button><b>${fmt(liteOf(h,dk))}</b><button data-a="dayLite" data-id="${h.id}" data-dir="1" aria-label="One more the easier way for ${esc(h.name)}">${icon('plus',13,2.6)}</button></div>`:''}${links.length?`<div class="dlinks">${links.join('')}</div>`:''}</div>${stepper}</div>`;
 }
@@ -2406,7 +2474,7 @@ function act(a,ds,e){
       render();floatText('Win claimed!',2);fxBurst(h.color,18,[2.5,5]);buzz([10,30,12]);
       showToast(`Win claimed: ${h.name}`,back);break}
     case 'unsettle':{if(S.settle[h.id])delete S.settle[h.id][settleKey(h,today())];save();if(S.partyHold&&!celebrationReady())endParty();render();break}
-    case 'minmark':{const v1=val(h,tk);change(h,tk,()=>setAmount(h,tk,v1>0?0:0.5));break}
+    case 'minmark':{const v1=val(h,tk);change(h,tk,()=>{if(v1>0){setAmount(h,tk,0);return}setAmount(h,tk,0.5);const m=S.settle[h.id]||(S.settle[h.id]={});m[settleKey(h,today())]=1;save()});break}   // logs the minimum and claims it: the habit is done
     case 'toggle':{
       const v0=val(h,tk);
       if(h.period!=='daily'&&v0===0&&progress(h,t0())>=h.goal){
@@ -2426,7 +2494,7 @@ function act(a,ds,e){
     case 'popcolor':S.sheet.draft.color=ds.v;renderIconPop();renderSheetBody();if(S.sheet.mode==='edit')liveApply();break;
     case 'toggleDone':S.showDone=!S.showDone;render();break;
     case 'habPop':openHabPop();break;
-    case 'habPick':S.cal.id=ds.id;closeIconPop();render();break;
+    case 'habPick':S.cal.id=ds.id;noteRecent(ds.id);closeIconPop();render();break;
     case 'iconPop':openIconPop();break;
     case 'amtAdd':case 'amtSub':{
       const inp=document.querySelector('#amt-input'),er=document.querySelector('#amt-err');
@@ -2468,7 +2536,7 @@ function act(a,ds,e){
     case 'dayStep':{const dk=S.cal.day;change(h,dk,()=>setAmount(h,dk,val(h,dk)+(+ds.dir)*(h.step||1)));break}
     case 'daySkip':{const d=parse(S.cal.day);setSkip(h,d,!isSkipped(h,d));render();break}
     case 'dayClaim':{const d=parse(S.cal.day),k=settleKey(h,d),m=S.settle[h.id]||(S.settle[h.id]={});if(m[k])delete m[k];else m[k]=1;save();render();break}
-    case 'goHabit':S.cal.id=ds.id;S.tab='calendar';S.resetScroll=true;render();break;
+    case 'goHabit':S.cal.id=ds.id;noteRecent(ds.id);S.tab='calendar';S.resetScroll=true;render();break;
     case 'settings':openSheet({type:'settings',confirm:null});break;
     case 'clearAll':
       if(S.sheet.confirm!=='clear'){S.sheet.confirm='clear';renderSheetBody();break}
@@ -2511,7 +2579,7 @@ function wire(){
     if(e.altKey&&e.target.classList&&e.target.classList.contains('row')&&(e.key==='ArrowUp'||e.key==='ArrowDown')){e.preventDefault();moveHabit(e.target.dataset.id,e.key==='ArrowUp'?-1:1);return}
     if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('row')){e.preventDefault();act('open',e.target.dataset,e)}
   });
-  app.addEventListener('input',e=>{if(e.target&&e.target.id==='set-name'){S.name=e.target.value.slice(0,24);save();renderMain();return}if(e.target&&e.target.id==='amt-input')syncAmtBtn();const f=e.target.dataset&&e.target.dataset.f;if(f&&S.sheet&&S.sheet.draft){S.sheet.draft[f]=e.target.value;if(S.sheet.mode==='edit')liveSoon()}});
+  app.addEventListener('input',e=>{if(e.target&&e.target.id==='pk-q'){S.pickQ=e.target.value;const l=$('#pk-list');if(l)l.innerHTML=pickListHTML();return}if(e.target&&e.target.id==='set-name'){S.name=e.target.value.slice(0,24);save();renderMain();return}if(e.target&&e.target.id==='amt-input')syncAmtBtn();const f=e.target.dataset&&e.target.dataset.f;if(f&&S.sheet&&S.sheet.draft){S.sheet.draft[f]=e.target.value;if(S.sheet.mode==='edit')liveSoon()}});
   app.addEventListener('change',e=>{
     if(e.target&&e.target.id==='backup-file'){
       const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;
