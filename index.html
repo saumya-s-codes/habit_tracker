@@ -2003,8 +2003,7 @@ function chartHTML(kind,a,b){
 }
 function renderInsights(){
   const head=`<div class="hdr"><div><h1>Insights</h1><div class="sub">Consistency compounds.</div></div>
-    <div style="display:flex;gap:10px;align-items:center">${selectPill('','<span>'+({week:'This week',month:'This month',year:'This year',all:'All time'}[S.ins.range])+'</span>','insRange',[['week','This week'],['month','This month'],['year','This year'],['all','All time']],S.ins.range)}
-    <button class="iconbtn" data-a="settings" aria-label="Settings">${icon('more',20)}</button></div></div>`;
+    <div style="display:flex;gap:10px;align-items:center">${selectPill('','<span>'+({week:'This week',month:'This month',year:'This year',all:'All time'}[S.ins.range])+'</span>','insRange',[['week','This week'],['month','This month'],['year','This year'],['all','All time']],S.ins.range)}</div></div>`;
   if(!S.habits.length)return head+emptyCard();
   const t=today(),kind=S.ins.range,[a,b]=rangeOf(kind,0),cur=dayRuns(a,b),pct=cur.total?cur.good/cur.total:0;
   let delta='';
@@ -2140,7 +2139,7 @@ function formBody(){
   return `${header}${s.from==='cal'?`${logSection(s)}<div class="divider"></div>`:''}${settings}<div class="divider"></div>${plan}${err}${del}`;
 }
 /* Bump these when you ship a change; they show at the bottom of Settings. */
-const APP_VERSION='2.8.0',APP_UPDATED='Nov 2, 2026';
+const APP_VERSION='2.8.1',APP_UPDATED='Nov 3, 2026';
 /* ---------- Back up and restore ----------
    One file, always called habits-backup.json, so backing up again replaces the last one instead of piling up copies. */
 const BACKUP_NAME='habits-backup.json';
